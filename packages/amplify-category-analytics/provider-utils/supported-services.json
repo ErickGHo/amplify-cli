@@ -51,5 +51,85 @@
     "cfnFilename": "kinesis-cloudformation-template.json",
     "provider": "awscloudformation",
     "alias": "Amazon Kinesis Streams"
+  },
+  "CloudWatch RUM": {
+    "inputs": [
+      {
+        "key": "rumMonitorName",
+        "question": "Provide your RUM resource name:",
+        "validation": {
+          "operator": "regex",
+          "value": "^[a-zA-Z0-9]+$",
+          "onErrorMsg": "Resource name should be alphanumeric"
+        },
+        "required": true
+      },
+      {
+        "key": "domainName",
+        "question": "Provide your top level domain name, i.e example.com:",
+        "validation": {
+          "operator": "regex",
+          "value": "^[a-zA-Z0-9.]+$",
+          "onErrorMsg": "Resource name should be alphanumeric, i.e example.com"
+        },
+        "required": true
+      },
+      {
+        "key": "configureAdvanced",
+        "question": "Configure Advanced Settings?",
+        "type": "list",
+        "options": [
+          {
+            "name": "Yes, let's configure advanced settings",
+            "value": true
+          },
+          {
+            "name": "No, complete configuration (amplify analytics update to modify)",
+            "value": false
+          }
+        ],
+        "required": true
+      }
+    ],
+    "advancedInputs": [
+      {
+        "key": "sessionSampleRate",
+        "question": "Specify the percentage you would like to sample for sessions (1-100%)",
+        "validation": {
+          "operator": "range",
+          "value": {
+            "min": 1,
+            "max": 100
+          },
+          "onErrorMsg": "The sample percentage rate should be in between 1 to 100 inclusive."
+        },
+        "required": true
+      },
+      {
+        "key": "telemetries",
+        "question": "Select the telemetries that you would like to monitor",
+        "type": "checkbox",
+        "options": [
+          {
+            "name": "Performance",
+            "value": "performance"
+          },
+          {
+            "name": "Javascript errors",
+            "value": "errors"
+          },
+          {
+            "name": "HTTP errors",
+            "value": "http"
+          }
+        ],
+        "required": true
+      }
+    ],
+    "defaultValuesFilename": "rum-defaults.js",
+    "serviceWalkthroughFilename": "rum-walkthrough.js",
+    "cfnFilename": "rum-cloudformation-template.json",
+    "provider": "awscloudformation",
+    "alias": "Amazon CloudWatch RUM (Real-user Monitoring)"
   }
 }

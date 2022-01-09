@@ -1,0 +1,171 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Cloudwatch RUM resource stack creation using Amplify CLI",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "rumMonitorName": {
+      "Type": "String"
+    },
+    "domain": {
+      "Type": "String"
+    },
+    "identityPoolId": {
+      "Type": "String"
+    },
+    "authPolicyName": {
+      "Type": "String"
+    },
+    "unauthPolicyName": {
+      "Type": "String"
+    },
+    "authRoleName": {
+      "Type": "String"
+    },
+    "unauthRoleName": {
+      "Type": "String"
+    },
+    "authRoleArn": {
+      "Type": "String"
+    },
+    "unauthRoleArn": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "RUMMonitor": {
+      "Type": "AWS::RUM::AppMonitor",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "-",
+            [
+              {
+                "Ref": "rumMonitorName"
+              },
+              {
+                "Ref": "env"
+              }
+            ]
+          ]
+        },
+        "Domain": {
+          "Ref": "domain"
+        },
+        "AppMonitorConfiguration": {
+          "IdentityPoolId": {
+            "Ref": "identityPoolId"
+          },
+          "GuestRoleArn": {
+            "Ref": "unauthRoleArn"
+          }
+        }
+      }
+    },
+    "CognitoUnauthPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {
+          "Ref": "unauthPolicyName"
+        },
+        "Roles": [
+          {
+            "Ref": "unauthRoleName"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "rum:PutRumEvents"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:rum:*:",
+                      {
+                        "Fn::Select": [
+                          "4",
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Ref": "authRoleArn"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      ":appmonitor/",
+                      {
+                        "Ref": "RUMMonitor"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "CognitoAuthPolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": {
+          "Ref": "authPolicyName"
+        },
+        "Roles": [
+          {
+            "Ref": "authRoleName"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "rum:PutRumEvents"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:rum:*:",
+                      {
+                        "Fn::Select": [
+                          "4",
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Ref": "authRoleArn"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      ":appmonitor/",
+                      {
+                        "Ref": "RUMMonitor"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+  }
+}

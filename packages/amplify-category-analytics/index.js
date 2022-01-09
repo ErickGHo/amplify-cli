@@ -16,7 +16,7 @@ async function console(context) {
       name: 'resource',
       message: 'Select resource',
       type: 'list',
-      choices: ['kinesis', 'pinpoint'],
+      choices: ['kinesis', 'pinpoint', 'rum'],
       required: true,
     };
 
